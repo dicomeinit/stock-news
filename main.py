@@ -7,6 +7,7 @@ STOCK_ENDPOINT = "https://www.alphavantage.co/query"
 NEWS_ENDPOINT = "https://newsapi.org/v2/everything"
 
 STOCK_API_KEY = "6PQGCTR965JFFEAO"
+NEWS_API_KEY = "470a01b2b91c4bc6bed0c2a80b3f07ee"
 
 stock_parameters = {
     "function": "TIME_SERIES_DAILY",
@@ -47,24 +48,32 @@ print(positive_diff)
 percentage_diff = (positive_diff/yesterday_closing_price) * 100
 print(percentage_diff)
 
-#TODO 5. - If TODO4 percentage is greater than 5 then print("Get News").
 
-if percentage_diff > 5:
-    print("Get News")
+# Instead of printing ("Get News"), use the News API to get articles related to the COMPANY_NAME.
 
-    ## STEP 2: https://newsapi.org/
-    # Instead of printing ("Get News"), actually get the first 3 news pieces for the COMPANY_NAME.
+if percentage_diff < 5:
 
-#TODO 6. - Instead of printing ("Get News"), use the News API to get articles related to the COMPANY_NAME.
+    news_parameters = {
+        "apiKey": NEWS_API_KEY,
+        "qInTitle": COMPANY_NAME,
 
-#TODO 7. - Use Python slice operator to create a list that contains the first 3 articles. Hint: https://stackoverflow.com/questions/509211/understanding-slice-notation
+    }
+    news_response = requests.get(NEWS_ENDPOINT, params=news_parameters)
+    news_response.raise_for_status()
+    articles = news_response.json()["articles"]
 
+    # Use Python slice operator to create a list that contains the first 3 articles.
+    # Hint: https://stackoverflow.com/questions/509211/understanding-slice-notation
+    tree_articles = articles[:3]
+    print(tree_articles)
 
-    ## STEP 3: Use twilio.com/docs/sms/quickstart/python
-    #to send a separate message with each article's title and description to your phone number.
+    # STEP 3: Use twilio.com/docs/sms/quickstart/python
+    # to send a separate message with each article's title and description to your phone number.
 
-#TODO 8. - Create a new list of the first 3 article's headline and description using list comprehension.
+    # Create a new list of the first 3 article's headline and description using list comprehension.
 
+    formatted_articles = [f"Headline: {article['title']}. \nBrief: {article['description']}" for article in tree_articles]
+    print(formatted_articles)
 #TODO 9. - Send each article as a separate message via Twilio.
 
 
